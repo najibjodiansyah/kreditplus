@@ -32,6 +32,14 @@ func (m *mysqlUserRepository) Create(ctx context.Context, user domain.User) erro
 	return nil
 }
 
+func (m *mysqlUserRepository) CreatePhoto(ctx context.Context, user domain.User) error {
+	result := m.Conn.Create(&user.Photo)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
 func (m *mysqlUserRepository) Update(ctx context.Context, user domain.User) error {
 	result := m.Conn.Save(&user)
 	if result.Error != nil {

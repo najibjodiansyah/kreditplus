@@ -3,13 +3,13 @@ package domain
 import "context"
 
 type Transaction struct {
-	Id           int
-	Nik          int
-	OTR          int
-	AdminFee     int
-	Instalment   int
-	BankInterest int
-	AssetName    string
+	ID           uint   `gorm:"primaryKey"`
+	Nik          string `gorm:"unique" json:"nik"`
+	OTR          int    `json:"otr"`
+	AdminFee     int    `json:"admin_fee"`
+	Instalment   int    `json:"instalment"`
+	BankInterest int    `json:"bank_interest"`
+	AssetName    string `json:"asset_name"`
 }
 
 type TransactionService interface {

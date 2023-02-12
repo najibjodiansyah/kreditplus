@@ -21,6 +21,13 @@ func (us *UserService) GetByNik(ctx context.Context, Id int) (domain.User, error
 	panic("implement me")
 }
 
+// func (us *UserService) CreatePhoto(ctx context.Context, user domain.User) error {
+// 	if err := us.userRepo.CreatePhoto(ctx, user); err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+
 func (us *UserService) Create(ctx context.Context, user domain.User) error {
 
 	hashedPassword, errEncrypt := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
@@ -29,6 +36,11 @@ func (us *UserService) Create(ctx context.Context, user domain.User) error {
 	}
 
 	user.Password = string(hashedPassword)
+
+	errPhoto := us.userRepo.CreatePhoto(ctx, user)
+	if errPhoto != nil {
+		return errPhoto
+	}
 
 	err := us.userRepo.Create(ctx, user)
 	if err != nil {

@@ -1,12 +1,20 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Limit struct {
-	Id    int
-	Nik   int
-	Tenor int
-	Limit int
+	ID        uint `gorm:"primaryKey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Nik       string         `gorm:"unique" json:"nik"`
+	Tenor     int            `json:"tenor"`
+	Limit     int            `json:"limit"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 type LimitService interface {

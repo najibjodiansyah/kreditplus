@@ -1,8 +1,9 @@
-package delivery
+package http
 
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/najibjodiansyah/kreditplus/domain"
+	"github.com/najibjodiansyah/kreditplus/utils"
 )
 
 type UserDelivery struct {
@@ -27,19 +28,9 @@ func (u *UserDelivery) Update(c echo.Context) error {
 }
 
 func (u *UserDelivery) Create(c echo.Context) error {
-	type request struct {
-		Nik        int
-		FullName   string
-		Password   string
-		LegalName  string
-		BirthPlace string
-		BirthDate  string
-		Wages      int
-	}
-
-	var input request
+	var input requestUser
 	if err := c.Bind(&input); err != nil {
-		return c.JSON(400, err)
+		return c.JSON(400, utils.NewResponse(utils.Failed, err.Error(), nil))
 	}
 
 	user := domain.User{
@@ -50,12 +41,16 @@ func (u *UserDelivery) Create(c echo.Context) error {
 		BirthPlace: input.BirthPlace,
 		BirthDate:  input.BirthDate,
 		Wages:      input.Wages,
+		Photo: domain.Photo{
+			Selfie: input.Photo.selfie,
+			Ktp:    input.Photo.ktp,
+		},
 	}
-
-	err := u.UserUseCase.Create(c.Request().Context(), user)
+	ctx := c.Request().Context()
+	err := u.UserUseCase.Create(ctx, user)
 	if err != nil {
-		return c.JSON(400, err)
+		return c.JSON(400, utils.NewResponse(utils.Failed, err.Error(), nil))
 	}
 
-	return c.JSON(200, "Success")
+	return c.JSON(201, utils.NewResponse(utils.Success, "user created", nil))
 }
