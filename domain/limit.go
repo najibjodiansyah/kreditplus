@@ -17,14 +17,14 @@ type Limit struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
-type LimitService interface {
-	Transaction(ctx context.Context) ([]Limit, error)
+type LimitUsecase interface {
+	Create(ctx context.Context, lm Limit) error
 	GetByNik(ctx context.Context, Id int) (Limit, error)
 	Update(ctx context.Context, lm Limit) error
 }
 
 type LimitRepository interface {
-	Transaction(ctx context.Context) ([]Limit, error)
+	Create(ctx context.Context, lm Limit) error
 	GetByNik(ctx context.Context, Id int) (Limit, error)
 	Update(ctx context.Context, lm Limit) error
 }

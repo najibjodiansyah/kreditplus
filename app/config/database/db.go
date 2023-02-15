@@ -1,8 +1,7 @@
-package config
+package database
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -10,18 +9,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
-
-func init() {
-	viper.SetConfigFile(`.env`)
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(err)
-	}
-
-	if viper.GetBool(`debug`) {
-		log.Println("Service RUN on DEBUG mode")
-	}
-}
 
 func InitDB() *gorm.DB {
 	userName := fmt.Sprintf("%v", viper.GetString("USERNAME"))
@@ -38,5 +25,5 @@ func InitDB() *gorm.DB {
 }
 
 func generateUri(userName, password, host, port, database string) string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", userName, password, host, port, database)
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", userName, password, host, port, database)
 }

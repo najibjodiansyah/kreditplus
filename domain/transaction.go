@@ -1,10 +1,14 @@
 package domain
 
-import "context"
+import (
+	"context"
+
+	"gorm.io/gorm"
+)
 
 type Transaction struct {
-	ID           uint   `gorm:"primaryKey"`
-	Nik          string `gorm:"unique" json:"nik"`
+	gorm.Model
+	User_id      uint   `gorm:"column:user_id"`
 	OTR          int    `json:"otr"`
 	AdminFee     int    `json:"admin_fee"`
 	Instalment   int    `json:"instalment"`
@@ -12,15 +16,13 @@ type Transaction struct {
 	AssetName    string `json:"asset_name"`
 }
 
-type TransactionService interface {
-	Fetch(ctx context.Context) ([]Transaction, error)
+type TransactionUsecase interface {
 	GetByNik(ctx context.Context, Id int) (Transaction, error)
 	Create(ctx context.Context, tr Transaction) error
 	Update(ctx context.Context, tr Transaction) error
 }
 
 type TransactionRepository interface {
-	Fetch(ctx context.Context) ([]Transaction, error)
 	GetByNik(ctx context.Context, Id int) (Transaction, error)
 	Create(ctx context.Context, tr Transaction) error
 	Update(ctx context.Context, tr Transaction) error
