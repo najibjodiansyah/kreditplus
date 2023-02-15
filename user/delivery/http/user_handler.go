@@ -52,7 +52,6 @@ func (u *UserDelivery) Update(c echo.Context) error {
 
 	user := domain.User{
 		FullName:     input.FullName,
-		Password:     input.Password,
 		LegalName:    input.LegalName,
 		BirthPlace:   input.BirthPlace,
 		BirthDate:    input.BirthDate,

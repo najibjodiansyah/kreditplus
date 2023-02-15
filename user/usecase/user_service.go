@@ -101,13 +101,6 @@ func UpdateUserValidation(nik string, user, current_user domain.User) (domain.Us
 	if user.FullName == "" {
 		user.FullName = current_user.FullName
 	}
-	if user.Password == "" {
-		hashedPassword, errEncrypt := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-		if errEncrypt != nil {
-			return domain.User{}, errEncrypt
-		}
-		user.Password = string(hashedPassword)
-	}
 
 	if user.LegalName == "" {
 		user.LegalName = current_user.LegalName

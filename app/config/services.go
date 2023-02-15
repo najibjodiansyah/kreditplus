@@ -5,12 +5,14 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	_logmon "github.com/labstack/gommon/log"
 	"github.com/najibjodiansyah/kreditplus/app/config/database"
 	_limitRepo "github.com/najibjodiansyah/kreditplus/limit/repository/mysql"
 	_transactionRepo "github.com/najibjodiansyah/kreditplus/transaction/repository/mysql"
 	_userHandler "github.com/najibjodiansyah/kreditplus/user/delivery/http"
 	_userRepo "github.com/najibjodiansyah/kreditplus/user/repository/mysql"
 	_userUseCase "github.com/najibjodiansyah/kreditplus/user/usecase"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -30,8 +32,23 @@ func Run() {
 	db := database.InitDB()
 	e := echo.New()
 
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	logger := logrus.New()
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogURI:    true,
+		LogStatus: true,
+		LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
+			logger.WithFields(logrus.Fields{
+				"URI":    values.URI,
+				"status": values.Status,
+			}).Info("request")
+
+			return nil
+		},
+	}))
+	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
+		StackSize: 1 << 10, // 1 KB
+		LogLevel:  _logmon.ERROR,
+	}))
 
 	userRepo := _userRepo.NewMysqlUserRepository(db)
 	limitRepo := _limitRepo.NewMysqlLimitRepository(db)

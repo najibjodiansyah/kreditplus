@@ -14,7 +14,6 @@ type CreateUser struct {
 
 type UpdateUser struct {
 	FullName     string
-	Password     string
 	LegalName    string
 	BirthPlace   string
 	BirthDate    string
