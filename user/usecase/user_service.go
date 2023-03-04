@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/najibjodiansyah/kreditplus/app/config/middleware"
@@ -9,26 +10,24 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserService struct {
-	UserRepo  domain.UserRepository
-	LimitRepo domain.LimitRepository
+type UserUseCase struct {
+	UserRepo domain.UserRepository
 }
 
-func NewUserService(ur domain.UserRepository, lr domain.LimitRepository) domain.UserUsecase {
-	return &UserService{
-		UserRepo:  ur,
-		LimitRepo: lr,
+func NewUserUseCase(ur domain.UserRepository) domain.UserUsecase {
+	return &UserUseCase{
+		UserRepo: ur,
 	}
 }
 
-func (us *UserService) Login(ctx echo.Context, nik, pass string) (string, error) {
+func (us *UserUseCase) Login(ctx echo.Context, nik, pass string) (string, error) {
 	user, err := us.UserRepo.Login(ctx, nik)
 	if err != nil {
 		return "", err
 	}
 
 	if user == (domain.User{}) {
-		return "", errors.New("user Not Empty")
+		return "", errors.New("user Empty")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pass)); err != nil {
@@ -43,7 +42,7 @@ func (us *UserService) Login(ctx echo.Context, nik, pass string) (string, error)
 	return token, nil
 }
 
-func (us *UserService) Create(ctx echo.Context, user domain.User) error {
+func (us *UserUseCase) Create(ctx echo.Context, user domain.User) error {
 
 	hashedPassword, errEncrypt := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if errEncrypt != nil {
@@ -57,27 +56,16 @@ func (us *UserService) Create(ctx echo.Context, user domain.User) error {
 		return err
 	}
 
-	// if gaji := user.Wages; gaji < 10000000 {
-	// 	return domain.ErrGajiKurang
-	// }
-
-	// create limit
-
 	return nil
 }
 
-func (us *UserService) Update(ctx echo.Context, user domain.User) error {
-	nik, err := middleware.GetNik(ctx)
+func (us *UserUseCase) Update(ctx echo.Context, user domain.User) error {
+	current_user, err := us.UserRepo.Login(ctx, user.Nik)
 	if err != nil {
 		return err
 	}
 
-	current_user, err := us.UserRepo.Login(ctx, nik)
-	if err != nil {
-		return err
-	}
-
-	user, err = UpdateUserValidation(nik, user, current_user)
+	user, err = UpdateUserValidation(user.Nik, user, current_user)
 	if err != nil {
 		return err
 	}
@@ -93,6 +81,7 @@ func (us *UserService) Update(ctx echo.Context, user domain.User) error {
 
 func UpdateUserValidation(nik string, user, current_user domain.User) (domain.User, error) {
 	user.ID = current_user.ID
+	var zeroTime time.Time
 
 	if user.Nik == "" {
 		user.Nik = current_user.Nik
@@ -108,7 +97,7 @@ func UpdateUserValidation(nik string, user, current_user domain.User) (domain.Us
 	if user.BirthPlace == "" {
 		user.BirthPlace = current_user.BirthPlace
 	}
-	if user.BirthDate == "" {
+	if user.BirthDate == zeroTime {
 		user.BirthDate = current_user.BirthDate
 	}
 	if user.Wages == 0 {

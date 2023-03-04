@@ -1,30 +1,24 @@
 package domain
 
 import (
-	"context"
-	"time"
-
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 type Limit struct {
-	ID        uint `gorm:"primaryKey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Nik       string         `gorm:"unique" json:"nik"`
-	Tenor     int            `json:"tenor"`
-	Limit     int            `json:"limit"`
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	gorm.Model
+	User_id uint `gorm:"column:user_id` // foreign key
+	Tenor   int  `gorm:"column:tenor"`
+	Limit   int  `gorm:"column:limit"`
+	User    User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type LimitUsecase interface {
-	Create(ctx context.Context, lm Limit) error
-	GetByNik(ctx context.Context, Id int) (Limit, error)
-	Update(ctx context.Context, lm Limit) error
+	Create(ctx echo.Context, lm Limit, nik string) error
+	GetById(ctx echo.Context, Id int) ([]Limit, error)
 }
 
 type LimitRepository interface {
-	Create(ctx context.Context, lm Limit) error
-	GetByNik(ctx context.Context, Id int) (Limit, error)
-	Update(ctx context.Context, lm Limit) error
+	Create(ctx echo.Context, lm Limit) error
+	GetById(ctx echo.Context, Id int) ([]Limit, error)
 }

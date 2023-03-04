@@ -1,33 +1,42 @@
 package usecase
 
 import (
-	"context"
-
+	"github.com/labstack/echo/v4"
 	"github.com/najibjodiansyah/kreditplus/domain"
 )
 
 type LimitUseCase struct {
-	TransactionRepo domain.TransactionRepository
-	UserRepo        domain.UserRepository
-	LimitRepo       domain.LimitRepository
+	UserRepo  domain.UserRepository
+	LimitRepo domain.LimitRepository
 }
 
-func NewUserService(ur domain.UserRepository, lm domain.LimitRepository, tr domain.TransactionRepository) domain.LimitUsecase {
+func NewUserService(ur domain.UserRepository, lm domain.LimitRepository) domain.LimitUsecase {
 	return &LimitUseCase{
-		UserRepo:        ur,
-		LimitRepo:       lm,
-		TransactionRepo: tr,
+		UserRepo:  ur,
+		LimitRepo: lm,
 	}
 }
 
-func (us *LimitUseCase) Create(ctx context.Context, lm domain.Limit) error {
-	panic("implement me")
+func (us *LimitUseCase) Create(ctx echo.Context, lm domain.Limit, nik string) error {
+	user, err := us.UserRepo.Login(ctx, nik)
+	if err != nil {
+		return err
+	}
+
+	lm.User_id = user.ID
+
+	err = us.LimitRepo.Create(ctx, lm)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (us *LimitUseCase) GetByNik(ctx context.Context, Id int) (domain.Limit, error) {
-	panic("implement me")
-}
-
-func (us *LimitUseCase) Update(ctx context.Context, lm domain.Limit) error {
-	panic("implement me")
+func (us *LimitUseCase) GetById(ctx echo.Context, Id int) ([]domain.Limit, error) {
+	limits, err := us.LimitRepo.GetById(ctx, Id)
+	if err != nil {
+		return nil, err
+	}
+	return limits, nil
 }

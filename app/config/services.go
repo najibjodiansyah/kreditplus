@@ -65,8 +65,8 @@ func Run() {
 	userRepo := _userRepo.NewMysqlUserRepository(db)
 	limitRepo := _limitRepo.NewMysqlLimitRepository(db)
 	transactionRepo := _transactionRepo.NewMysqlTransactionRepository(db)
-	log.Println(transactionRepo)
-	userUseCase := _userUseCase.NewUserService(userRepo, limitRepo)
+	log.Println(transactionRepo, limitRepo)
+	userUseCase := _userUseCase.NewUserUseCase(userRepo)
 
 	_userHandler.NewUserDelivery(e, userUseCase)
 
