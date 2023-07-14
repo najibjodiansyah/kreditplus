@@ -15,3 +15,9 @@ https://www.simulasikredit.com/simulasi_kredit_mobil_simpel.php
 db orm using bun
 
 rest router and middleware helped by gin-gonic // carefull make u drunk
+
+gomock for mock function
+
+challange ur self make unit and integration test using flag golang
+
+monitoring using open telemetry and jaeger
